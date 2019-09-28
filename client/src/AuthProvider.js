@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect
 } from "react";
+import { withRouter } from "react-router-dom";
 
 // trying https://medium.com/trabe/how-we-handle-react-context-e43d303a27a2
 // and https://medium.com/trabe/implementing-private-routes-with-react-router-and-hooks-ed38d0cf93d5
@@ -33,6 +34,7 @@ const AuthProvider = props => {
   const logout = () => {
     localStorage.removeItem("advToken");
     setUser(initialAuth);
+    props.history.push("/");
   };
 
   const auth = useMemo(
@@ -49,7 +51,7 @@ const AuthProvider = props => {
 
 export const useAuthContext = () => useContext(AuthContext);
 
-export default AuthProvider;
+export default withRouter(AuthProvider);
 
 // const initialAuthData = {};
 
