@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "./axios-instance";
 
+import { useAuthContext } from "./AuthProvider";
+
 const Login = props => {
+  // grab login
+  const { login } = useAuthContext();
+
   const useLoginForm = cb => {
     // custom hook handles login form actions
     const [inputs, setInputs] = useState({ username: "", password: "" });
@@ -21,19 +26,20 @@ const Login = props => {
     return { handleSubmit, handleInput, inputs };
   };
 
-  const login = inputs => {
+  const onLogin = inputs => {
     axios
       .post("login/", inputs)
       .then(res => {
         console.log(res.data);
-        localStorage.setItem("advToken", res.data.key);
+        // localStorage.setItem("advToken", res.data.key);
+        login(res.data);
         props.history.push("/adv");
       })
       .catch(err => console.log(err.message));
     return null;
   };
 
-  const { inputs, handleInput, handleSubmit } = useLoginForm(login);
+  const { inputs, handleInput, handleSubmit } = useLoginForm(onLogin);
 
   return (
     <form onSubmit={handleSubmit}>

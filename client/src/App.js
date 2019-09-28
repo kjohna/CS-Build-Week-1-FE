@@ -2,6 +2,7 @@ import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import styled from "styled-components";
 
+import { useAuthContext } from "./AuthProvider";
 import Adv from "./Adv";
 import Login from "./Login";
 
@@ -13,25 +14,22 @@ const AppContainer = styled.div`
   height: 100vh;
 `;
 
-function App() {
-  // token in local storage for now...
-  const token = localStorage.getItem("advToken");
-  console.log(token);
+const PrivateRoute = ({ component, ...options }) => {
+  const { user } = useAuthContext();
+  console.log(user);
+  const finalComponent = user ? component : Login;
 
+  return <Route {...options} component={finalComponent} />;
+};
+
+function App() {
   // protect routes from user w/o token
   let routes = (
     <Switch>
       <Route path="/" exact component={Login} />
+      <PrivateRoute path="/adv" component={Adv} />
     </Switch>
   );
-  if (token) {
-    routes = (
-      <Switch>
-        <Redirect to="/adv" />
-        <Route path="/adv" component={Adv} />
-      </Switch>
-    );
-  }
 
   return <AppContainer>{routes}</AppContainer>;
 }
