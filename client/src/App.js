@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Switch, Route, Redirect } from "react-router-dom";
+import styled from "styled-components";
+
+import Adv from "./Adv";
+import Login from "./Login";
+
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  // token in local storage for now...
+  const token = localStorage.getItem("advToken");
+  console.log(token);
+
+  // protect routes from user w/o token
+  let routes = (
+    <Switch>
+      <Route path="/" exact component={Login} />
+    </Switch>
   );
+  if (token) {
+    routes = (
+      <Switch>
+        <Redirect to="/adv" />
+        <Route path="/adv" component={Adv} />
+      </Switch>
+    );
+  }
+
+  return <AppContainer>{routes}</AppContainer>;
 }
 
 export default App;
