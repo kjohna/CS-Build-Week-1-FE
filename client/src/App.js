@@ -1,10 +1,10 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import styled from "styled-components";
 
 import { useAuthContext } from "./AuthProvider";
 import Adv from "./Adv";
-import Login from "./Login";
+import LoginRegister from "./LoginRegister";
 
 const AppContainer = styled.div`
   display: flex;
@@ -14,10 +14,11 @@ const AppContainer = styled.div`
   height: 100vh;
 `;
 
+// privateRoute middleware, protects a route using auth context via AuthProvider
 const PrivateRoute = ({ component, ...options }) => {
   const { user } = useAuthContext();
   console.log(user);
-  const finalComponent = user ? component : Login;
+  const finalComponent = user ? component : LoginRegister;
 
   return <Route {...options} component={finalComponent} />;
 };
@@ -26,7 +27,7 @@ function App() {
   // protect routes from user w/o token
   let routes = (
     <Switch>
-      <Route path="/" exact component={Login} />
+      <Route path="/" exact component={LoginRegister} />
       <PrivateRoute path="/adv" component={Adv} />
     </Switch>
   );

@@ -1,11 +1,6 @@
-import React, {
-  createContext,
-  useState,
-  useMemo,
-  useContext,
-  useEffect
-} from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { withRouter } from "react-router-dom";
+import axios from "./axios-instance";
 
 // trying https://medium.com/trabe/how-we-handle-react-context-e43d303a27a2
 // and https://medium.com/trabe/implementing-private-routes-with-react-router-and-hooks-ed38d0cf93d5
@@ -21,8 +16,14 @@ const AuthProvider = props => {
   useEffect(() => {
     const token = localStorage.getItem("advToken");
     if (token) {
-      setUser(user => ({ ...user, token }));
       // TODO: api call to init, set other user info
+      axios
+        .get("adv/init/")
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => console.log(err.message));
+      setUser(user => ({ ...user, token }));
     }
   }, []);
 
@@ -37,14 +38,12 @@ const AuthProvider = props => {
     props.history.push("/");
   };
 
-  const auth = useMemo(
-    () => ({
-      user,
-      login,
-      logout
-    }),
-    [user]
-  );
+  // TODO: useMemo here??
+  const auth = {
+    user,
+    login,
+    logout
+  };
 
   return <AuthContext.Provider value={auth} {...props} />;
 };
