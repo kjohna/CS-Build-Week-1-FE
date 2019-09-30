@@ -17,7 +17,7 @@ const AppContainer = styled.div`
 // privateRoute middleware, protects a route using auth context via AuthProvider
 const PrivateRoute = ({ component, ...options }) => {
   const { user } = useAuthContext();
-  console.log(user);
+  // console.log(user);
   const finalComponent = user ? component : LoginRegister;
 
   return <Route {...options} component={finalComponent} />;
@@ -27,7 +27,7 @@ function App() {
   // protect routes from user w/o token
   let routes = (
     <Switch>
-      <Route path="/" exact component={LoginRegister} />
+      <Route exact path="/" component={LoginRegister} />
       <PrivateRoute path="/adv" component={Adv} />
     </Switch>
   );

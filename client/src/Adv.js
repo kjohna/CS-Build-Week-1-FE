@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Adv = () => {
   const { user, logout } = useAuthContext();
-  console.log(user);
+  // console.log(user);
   if (!user.token) {
     return <Link to="/">Must Log in</Link>;
   }

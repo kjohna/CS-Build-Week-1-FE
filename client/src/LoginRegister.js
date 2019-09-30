@@ -26,16 +26,18 @@ const LoginRegister = props => {
       }
       try {
         const res = await cb(inputs);
-        console.log("useLoginForm handleSubmit", res.data);
+        // careful what you do with res... cb might not return anything?
       } catch (err) {
         // NOTE: error handling here is specific to how BE is sending error responses.
-        console.log("submit form error: ", Object.keys(err));
+        // console.log("submit form error: ", err);
         // if the error was due to a bad password choice
         if (err.response.data.password1) {
           setErrors({ error: true, submitError: err.response.data.password1 });
+        } else if (err.response.data.username) {
+          setErrors({ error: true, submitError: err.response.data.username });
         } else if (err.response.data.non_field_errors) {
           // else other error will be in:
-          console.log("submit form error: ", err.response.data);
+          // console.log("submit form error: ", err.response.data);
           setErrors({
             error: true,
             submitError: err.response.data.non_field_errors
@@ -102,12 +104,12 @@ const LoginRegister = props => {
     if (inputs.isLogin) {
       try {
         const res = await axios.post("login/", inputs);
-        console.log(res.data);
+        // console.log(res.data);
         // localStorage.setItem("advToken", res.data.key);
         login(res.data);
         props.history.push("/adv");
       } catch (err) {
-        console.log("caught", err.message);
+        console.log("caught onLoginRegister", err.message);
         // re-throw error so that useLoginForm will catch and handle
         throw err;
       }
@@ -116,16 +118,15 @@ const LoginRegister = props => {
       const fmtInputs = { ...inputs, password1: inputs.password };
       try {
         const res = await axios.post("registration/", fmtInputs);
-        console.log(res.data);
+        // console.log(res.data);
         login(res.data);
         props.history.push("/adv");
       } catch (err) {
-        console.log(err.message);
+        console.log("caught onLoginRegister", err.message);
         // re-throw error so that useLoginForm will catch and handle
         throw err;
       }
     }
-    return null;
   };
 
   const { inputs, errors, disabled, handleInput, handleSubmit } = useLoginForm(
