@@ -17,80 +17,113 @@ const LoginRegister = props => {
   const useLoginForm = (cb, defaults) => {
     const [inputs, setInputs] = useState({ ...defaults });
     const [errors, setErrors] = useState({ ...defaults });
-    const [changed, setChanged] = useState(false);
+    const [changed, setChanged] = useState({});
     const [disabled, setDisabled] = useState(true);
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
       if (e) {
         e.preventDefault();
       }
-      cb(inputs);
+      try {
+        const res = await cb(inputs);
+        console.log("useLoginForm handleSubmit", res.data);
+      } catch (err) {
+        // NOTE: error handling here is specific to how BE is sending error responses.
+        console.log("submit form error: ", Object.keys(err));
+        // if the error was due to a bad password choice
+        if (err.response.data.password1) {
+          setErrors({ error: true, submitError: err.response.data.password1 });
+        } else if (err.response.data.non_field_errors) {
+          // else other error will be in:
+          console.log("submit form error: ", err.response.data);
+          setErrors({
+            error: true,
+            submitError: err.response.data.non_field_errors
+          });
+        } else {
+          // should be a pretty general case
+          setErrors({
+            error: true,
+            submitError: err.message
+          });
+        }
+        setDisabled(true);
+      }
     };
 
     // whenever inputs change disable submit and update errors
     useEffect(() => {
-      if (changed) {
-        let errors = { error: false };
-        // validate inputs
-        // username required
-        if (!inputs.username) {
-          errors.username = "Username empty.";
-          errors.error = true;
-        }
-        // login + register: password not empty
-        if (!inputs.password) {
-          errors.password = "Password empty.";
-          errors.error = true;
-        }
-        // register: password1 & password2 match
-        if (!inputs.isLogin) {
-          if (inputs.password !== inputs.password2) {
-            errors.password2 = "Passwords do not match.";
-            errors.error = true;
-          }
-        }
-        // disable form if errors
-        setDisabled(errors.error);
-        setErrors(errors);
+      let errors = { error: false };
+      // validate inputs
+      // username required
+      if (changed.username && !inputs.username) {
+        errors.username = "Username empty.";
+        errors.error = true;
+        setChanged(changed => ({ ...changed, [changed.username]: false }));
       }
-    }, [inputs]);
+      // login + register: password not empty
+      if (changed.password && !inputs.password) {
+        errors.password = "Password empty.";
+        errors.error = true;
+        setChanged(changed => ({ ...changed, [changed.password]: false }));
+      }
+      // register: password1 & password2 match
+      if (changed.password2 && !inputs.isLogin) {
+        if (inputs.password !== inputs.password2) {
+          errors.password2 = "Passwords do not match.";
+          errors.error = true;
+          setChanged(changed => ({
+            ...changed,
+            [changed.password]: false,
+            [changed.password2]: false
+          }));
+        }
+      }
+      // first time disable form
+      if (!inputs.username || !inputs.password) {
+        setDisabled(true);
+      } else {
+        setDisabled(errors.error);
+      }
+      // disable form if errors
+      setErrors(errors);
+    }, [inputs, changed]);
 
     const handleInput = e => {
       e.persist();
-      setChanged(true);
+      setChanged(changed => ({ ...changed, [e.target.name]: true }));
       setInputs(inputs => ({ ...inputs, [e.target.name]: e.target.value }));
     };
     return { handleSubmit, handleInput, inputs, disabled, errors };
   };
 
-  const onLoginRegister = inputs => {
-    // TODO disabling form should make this unnecessary:
-    if (inputs.error) {
-      console.log("form invalid: ", inputs.error);
-      // decide to display errors at this point?
-      return null;
-    }
+  const onLoginRegister = async inputs => {
+    // handle login/register form submit
     if (inputs.isLogin) {
-      axios
-        .post("login/", inputs)
-        .then(res => {
-          console.log(res.data);
-          // localStorage.setItem("advToken", res.data.key);
-          login(res.data);
-          props.history.push("/adv");
-        })
-        .catch(err => console.log(err.message));
+      try {
+        const res = await axios.post("login/", inputs);
+        console.log(res.data);
+        // localStorage.setItem("advToken", res.data.key);
+        login(res.data);
+        props.history.push("/adv");
+      } catch (err) {
+        console.log("caught", err.message);
+        // re-throw error so that useLoginForm will catch and handle
+        throw err;
+      }
     } else {
-      // /register is expecting "password1" instead of "password"
+      // "/register" is expecting "password1" instead of "password"
       const fmtInputs = { ...inputs, password1: inputs.password };
-      axios
-        .post("registration/", fmtInputs)
-        .then(res => {
-          console.log(res.data);
-          login(res.data);
-          props.history.push("/adv");
-        })
-        .catch(err => console.log(err.message));
+      try {
+        const res = await axios.post("registration/", fmtInputs);
+        console.log(res.data);
+        login(res.data);
+        props.history.push("/adv");
+      } catch (err) {
+        console.log(err.message);
+        // re-throw error so that useLoginForm will catch and handle
+        throw err;
+      }
     }
     return null;
   };
@@ -105,7 +138,7 @@ const LoginRegister = props => {
       error: false
     }
   );
-  console.log("form disabled: ", disabled);
+
   return (
     <div>
       <button
@@ -157,6 +190,7 @@ const LoginRegister = props => {
         <button disabled={disabled} type="submit">
           {inputs.isLogin ? "Log in" : "Register"}
         </button>
+        <FormError>{errors.submitError}</FormError>
       </form>
     </div>
   );
