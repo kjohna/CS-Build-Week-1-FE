@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
+// import { Provider } from "react-redux"
+// import store from '../store';
 import { BrowserRouter } from "react-router-dom";
-import AuthProvider from "./AuthProvider";
-import App from "./App";
+import AuthProvider from "./components/AuthProvider";
+import App from "./components/App";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(

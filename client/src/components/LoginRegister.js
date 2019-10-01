@@ -1,10 +1,10 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import styled from "styled-components";
-import axios from "./axios-instance";
+import axios from "../axios-instance";
 
 import { useAuthContext } from "./AuthProvider";
-import useLoginForm from "./useLoginForm";
+import useLoginForm from "../hooks/useLoginForm";
 
 const FormError = styled.div`
   color: red;

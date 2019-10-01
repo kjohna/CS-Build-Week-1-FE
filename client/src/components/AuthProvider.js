@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import axios from "./axios-instance";
+import axios from "../axios-instance";
 
 // trying https://medium.com/trabe/how-we-handle-react-context-e43d303a27a2
 // and https://medium.com/trabe/implementing-private-routes-with-react-router-and-hooks-ed38d0cf93d5
