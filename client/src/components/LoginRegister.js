@@ -1,9 +1,9 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import axios from "../axios-instance";
 
-import { useAuthContext } from "./AuthProvider";
 import useLoginForm from "../hooks/useLoginForm";
 
 const FormError = styled.div`
@@ -11,8 +11,8 @@ const FormError = styled.div`
 `;
 
 const LoginRegister = props => {
-  // grab login handler from Auth Provider
-  const { login } = useAuthContext();
+  // grab login from redux store
+  const login = useSelector(state => state.auth.token);
 
   const onLoginRegister = async inputs => {
     // handle login/register form submit

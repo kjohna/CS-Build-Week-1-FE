@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders without crashing 1`] = `
+<ContextProvider
+  value={null}
+>
+  <App
+    checkLogin={[Function]}
+    dispatch={[MockFunction]}
+    store={
+      Object {
+        "getState": [Function],
+      }
+    }
+    token=""
+  />
+</ContextProvider>
+`;
