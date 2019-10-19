@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Redirect, Route, useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import styled from "styled-components";
 
@@ -17,37 +17,34 @@ const AppContainer = styled.div`
 `;
 
 // privateRoute middleware, protects a route based on login state (token present in redux store)
-const PrivateRoute = ({ component, token, checkLogin, ...options }) => {
-  // const dispatch = useDispatch();
-  // // hook into Redux store
-  // const token = useSelector(state => state.auth.token);
-  // // run check token action to kick things off
-  console.log("here", token);
-  if (!token) {
-    // dispatch({ type: actionTypes.AUTH_STARTING });
-    // dispatch(checkLogin());
-    checkLogin();
-  }
-  const finalComponent = token ? component : LoginRegister;
+const PrivateRoute = ({ component, token, ...options }) => {
+  const finalComponent = token ? (
+    <Route {...options} component={component} />
+  ) : (
+    <Redirect to="/" />
+  );
 
-  return <Route {...options} component={finalComponent} />;
+  return finalComponent;
 };
 
 function App(props) {
   // protect routes from user w/o token
-  console.log(props);
-  const { token, checkLogin } = props;
-  checkLogin(props.dispatch);
-  console.log("token: ", token);
+  const { auth, checkLogin } = props;
+  const token = auth.token;
+  const history = useHistory();
+  // if no token, check local storage for existing token
+  // auth.error is set after unsuccessful lcl storage check
+  if (!token && !auth.error) {
+    // will redirect to /adv if token is found
+    // need to pass in history and location to achieve this since token is not set, a redirect to "/" will render this time
+    // NOTE: could employ useLocation to do this dynamically
+    checkLogin("/adv", history);
+  }
+  // checkLogin(props.dispatch);
   let routes = (
     <Switch>
       <Route exact path="/" component={LoginRegister} />
-      <PrivateRoute
-        path="/adv"
-        component={Adv}
-        token={token}
-        checkLogin={checkLogin}
-      />
+      <PrivateRoute path="/adv" component={Adv} token={token} />
     </Switch>
   );
 
@@ -55,7 +52,7 @@ function App(props) {
 }
 
 const mapStateToProps = state => ({
-  token: state.auth.token
+  auth: state.auth
 });
 
 const mapDispatchToProps = {

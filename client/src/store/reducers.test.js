@@ -90,4 +90,39 @@ describe("test auth reducer", () => {
     };
     expect(actual).toEqual(expected);
   });
+  it("resets initial AUTH state on LOGOUT", () => {
+    const action = { type: actionTypes.LOGOUT };
+    const actual = reducer(
+      {
+        ...createState(),
+        auth: {
+          tmp: "some auth state that needs to be cleared"
+        }
+      },
+      action
+    );
+    const expected = {
+      ...createState()
+    };
+    expect(actual).toEqual(expected);
+  });
+});
+
+describe("test adv reducer", () => {
+  it("resets initial ADV state on LOGOUT", () => {
+    const action = { type: actionTypes.LOGOUT };
+    const actual = reducer(
+      {
+        ...createState(),
+        adv: {
+          tmp: "some adv state that needs to be cleared"
+        }
+      },
+      action
+    );
+    const expected = {
+      ...createState()
+    };
+    expect(actual).toEqual(expected);
+  });
 });

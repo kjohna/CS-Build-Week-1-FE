@@ -2,9 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-function logout() {
-  console.log("TODO create logout action!");
-}
+import { logout } from "../store/actions";
 
 const Adv = props => {
   const { user, token } = props;
@@ -15,7 +13,7 @@ const Adv = props => {
   return (
     <div>
       <div>{token} ADV!!</div>
-      <button onClick={() => logout()}>Log Out</button>
+      <button onClick={() => props.logout()}>Log Out</button>
     </div>
   );
 };
@@ -25,7 +23,7 @@ const mapStateToProps = state => ({
   token: state.auth.token
 });
 
-const mapDispatchToProps = null;
+const mapDispatchToProps = { logout };
 
 export default connect(
   mapStateToProps,

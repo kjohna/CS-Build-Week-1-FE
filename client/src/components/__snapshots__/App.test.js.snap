@@ -5,6 +5,17 @@ exports[`renders without crashing 1`] = `
   value={null}
 >
   <App
+    auth={
+      Object {
+        "error": null,
+        "loading": false,
+        "token": "",
+        "user": Object {
+          "username": "",
+          "uuid": "",
+        },
+      }
+    }
     checkLogin={[Function]}
     dispatch={[MockFunction]}
     store={
@@ -12,7 +23,6 @@ exports[`renders without crashing 1`] = `
         "getState": [Function],
       }
     }
-    token=""
   />
 </ContextProvider>
 `;

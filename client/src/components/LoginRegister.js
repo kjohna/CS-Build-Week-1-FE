@@ -1,30 +1,37 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import axios from "../axios-instance";
 
 import useLoginForm from "../hooks/useLoginForm";
+
+import { handleLogin } from "../store/actions";
 
 const FormError = styled.div`
   color: red;
 `;
 
 const LoginRegister = props => {
-  // grab login from redux store
-  const login = useSelector(state => state.auth.token);
-
+  // grab dispatch, onLoginRegister will dispatch appropriate action
+  const dispatch = useDispatch();
+  // const authLoading = useSelector(state => state.auth.loading);
+  // const authError = useSelector(state => state.auth.error);
+  // const authErrorMsg = {
+  //   "Request failed with status code 400":
+  //     "Unknown Username/Password combination."
+  // };
+  // handle form submit:
   const onLoginRegister = async inputs => {
     // handle login/register form submit
     if (inputs.isLogin) {
       try {
-        const res = await axios.post("login/", inputs);
-        // console.log(res.data);
-        // localStorage.setItem("advToken", res.data.key);
-        login(res.data);
+        // console.log("onLoginRegister");
+        await dispatch(handleLogin(inputs));
+        // console.log("done, res: ", res);
         props.history.push("/adv");
       } catch (err) {
-        console.log("caught onLoginRegister", err.message);
+        console.log("caught onLoginRegister - component", err.message);
         // re-throw error so that useLoginForm will catch and handle
         throw err;
       }
@@ -34,7 +41,7 @@ const LoginRegister = props => {
       try {
         const res = await axios.post("registration/", fmtInputs);
         // console.log(res.data);
-        login(res.data);
+        handleLogin(res.data);
         props.history.push("/adv");
       } catch (err) {
         console.log("caught onLoginRegister", err.message);
@@ -107,6 +114,7 @@ const LoginRegister = props => {
           {inputs.isLogin ? "Log in" : "Register"}
         </button>
         <FormError>{errors.submitError}</FormError>
+        {/* <FormError>{authError && authErrorMsg[authError]}</FormError> */}
       </form>
     </div>
   );

@@ -31,6 +31,9 @@ const auth = (state = initialAuth, action = {}) => {
         loading: false,
         error: action.payload
       };
+    case actionTypes.LOGOUT:
+      // not much happening here for now, but maybe a good place for fancy stuff in the future? maybe caching some state?
+      return { ...initialAuth };
     default:
       return state;
   }
@@ -45,14 +48,12 @@ const initialAdv = {
 // adv reducer
 const adv = (state = initialAdv, action = {}) => {
   switch (action.type) {
+    case actionTypes.LOGOUT:
+      // not much happening here for now, but maybe a good place for fancy stuff in the future? maybe caching some state?
+      return { ...initialAdv };
     default:
       return state;
   }
-};
-
-const initialState = {
-  initialAuth,
-  initialAdv
 };
 
 const combinedReducers = combineReducers({ auth, adv });

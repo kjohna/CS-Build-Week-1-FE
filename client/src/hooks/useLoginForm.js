@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 
 // custom hook handles login form actions, manages validation and state of form
@@ -12,12 +11,12 @@ const useLoginForm = (cb, defaults) => {
     if (e) {
       e.preventDefault();
     }
+    console.log("handleSubmit, e preventDefaulted");
     try {
-      const res = await cb(inputs);
-      // careful what you do with res... cb might not return anything?
+      await cb(inputs);
     } catch (err) {
       // NOTE: error handling here is specific to how BE is sending error responses.
-      // console.log("submit form error: ", err);
+      console.log("submit form error: ", err);
       // if the error was due to a bad password choice
       if (err.response.data.password1) {
         setErrors({ error: true, submitError: err.response.data.password1 });
@@ -45,27 +44,29 @@ const useLoginForm = (cb, defaults) => {
   useEffect(() => {
     let errors = { error: false };
     // validate inputs
+    // console.log("validate inputs, username: ", inputs.username);
     // username required
     if (changed.username && !inputs.username) {
+      // console.log("username empty");
       errors.username = "Username empty.";
       errors.error = true;
-      setChanged(changed => ({ ...changed, [changed.username]: false }));
+      setChanged(changed => ({ ...changed, username: false }));
     }
     // login + register: password not empty
     if (changed.password && !inputs.password) {
       errors.password = "Password empty.";
       errors.error = true;
-      setChanged(changed => ({ ...changed, [changed.password]: false }));
+      setChanged(changed => ({ ...changed, password: false }));
     }
     // register: password1 & password2 match
-    if (changed.password2 && !inputs.isLogin) {
+    if ((changed.password || changed.password2) && !inputs.isLogin) {
       if (inputs.password !== inputs.password2) {
         errors.password2 = "Passwords do not match.";
         errors.error = true;
         setChanged(changed => ({
           ...changed,
-          [changed.password]: false,
-          [changed.password2]: false
+          password: false,
+          password2: false
         }));
       }
     }
@@ -77,7 +78,7 @@ const useLoginForm = (cb, defaults) => {
     }
     // disable form if errors
     setErrors(errors);
-  }, [inputs, changed]);
+  }, [inputs]);
 
   const handleInput = e => {
     e.persist();
