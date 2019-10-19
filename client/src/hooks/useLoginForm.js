@@ -50,24 +50,17 @@ const useLoginForm = (cb, defaults) => {
       // console.log("username empty");
       errors.username = "Username empty.";
       errors.error = true;
-      setChanged(changed => ({ ...changed, username: false }));
     }
     // login + register: password not empty
     if (changed.password && !inputs.password) {
       errors.password = "Password empty.";
       errors.error = true;
-      setChanged(changed => ({ ...changed, password: false }));
     }
     // register: password1 & password2 match
     if ((changed.password || changed.password2) && !inputs.isLogin) {
       if (inputs.password !== inputs.password2) {
         errors.password2 = "Passwords do not match.";
         errors.error = true;
-        setChanged(changed => ({
-          ...changed,
-          password: false,
-          password2: false
-        }));
       }
     }
     // first time disable form
@@ -78,7 +71,7 @@ const useLoginForm = (cb, defaults) => {
     }
     // disable form if errors
     setErrors(errors);
-  }, [inputs]);
+  }, [inputs, changed]);
 
   const handleInput = e => {
     e.persist();
