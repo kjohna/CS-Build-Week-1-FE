@@ -34,7 +34,7 @@ function App(props) {
   const history = useHistory();
   // if no token, check local storage for existing token
   // auth.error is set after unsuccessful lcl storage check
-  if (!token && !auth.error) {
+  if (!token && !auth.error && !auth.loading) {
     // will redirect to /adv if token is found
     // need to pass in history and location to achieve this since token is not set, a redirect to "/" will render this time
     // NOTE: could employ useLocation to do this dynamically

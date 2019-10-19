@@ -52,9 +52,9 @@ export function checkLogin(location, history) {
 }
 
 export function handleLogin(userInput) {
-  return dispatch => {
+  return async dispatch => {
     dispatch(authStarting());
-    console.log("auth starting, usr:", userInput);
+    // console.log("auth starting, usr:", userInput);
     return axios
       .post("login/", userInput)
       .then(res => {

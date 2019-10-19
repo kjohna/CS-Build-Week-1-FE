@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import axios from "../axios-instance";
 
@@ -15,12 +15,8 @@ const FormError = styled.div`
 const LoginRegister = props => {
   // grab dispatch, onLoginRegister will dispatch appropriate action
   const dispatch = useDispatch();
-  // const authLoading = useSelector(state => state.auth.loading);
-  // const authError = useSelector(state => state.auth.error);
-  // const authErrorMsg = {
-  //   "Request failed with status code 400":
-  //     "Unknown Username/Password combination."
-  // };
+  const authLoading = useSelector(state => state.auth.loading);
+  authLoading && console.log("authLoading: ", authLoading);
   // handle form submit:
   const onLoginRegister = async inputs => {
     // handle login/register form submit
@@ -28,7 +24,7 @@ const LoginRegister = props => {
       try {
         // console.log("onLoginRegister");
         await dispatch(handleLogin(inputs));
-        // console.log("done, res: ", res);
+        console.log("handleLogin done");
         props.history.push("/adv");
       } catch (err) {
         console.log("caught onLoginRegister - component", err.message);
@@ -110,7 +106,7 @@ const LoginRegister = props => {
             <FormError>{errors.password2}</FormError>
           </div>
         )}
-        <button disabled={disabled} type="submit">
+        <button disabled={disabled || authLoading} type="submit">
           {inputs.isLogin ? "Log in" : "Register"}
         </button>
         <FormError>{errors.submitError}</FormError>
