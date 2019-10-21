@@ -1,6 +1,7 @@
 import { combineReducers } from "redux";
-import { actionTypes } from "./actions";
+import actionExports from "./actions";
 
+const { actionTypes } = actionExports;
 // initial auth state
 const initialAuth = {
   token: "",

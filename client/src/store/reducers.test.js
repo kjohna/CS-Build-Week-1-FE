@@ -1,5 +1,7 @@
 import reducer from "./reducers";
-import { actionTypes } from "./actions";
+import actionExports from "./actions";
+
+const { actionTypes } = actionExports;
 
 const createUser = ({ username = "", uuid = "" } = {}) => ({ username, uuid });
 

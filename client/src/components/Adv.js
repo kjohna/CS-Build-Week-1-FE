@@ -2,7 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { logout } from "../store/actions";
+import actionExports from "../store/actions";
+
+const { logout } = actionExports;
 
 const Adv = props => {
   const { user, token } = props;

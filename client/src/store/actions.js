@@ -1,6 +1,6 @@
 import axios from "../axios-instance";
 
-export const actionTypes = {
+const actionTypes = {
   AUTH_STARTING: "AUTH_STARTING",
   AUTH_SUCCESS: "AUTH_SUCCESS",
   AUTH_FAIL: "AUTH_FAIL",
@@ -29,13 +29,13 @@ function authFail(err) {
   };
 }
 
-export function logout() {
+function logout() {
   localStorage.removeItem("advToken");
   return { type: actionTypes.LOGOUT };
 }
 
 // action creators
-export function checkLogin(location, history) {
+function checkLogin(location, history) {
   return function(dispatch) {
     const token = localStorage.getItem("advToken");
     dispatch(authStarting());
@@ -51,7 +51,7 @@ export function checkLogin(location, history) {
   };
 }
 
-export function handleLogin(userInput) {
+function handleLogin(userInput) {
   return async dispatch => {
     dispatch(authStarting());
     // console.log("auth starting, usr:", userInput);
@@ -70,6 +70,16 @@ export function handleLogin(userInput) {
   };
 }
 
+function handleRegister(userInput) {
+  return async dispatch => {
+    dispatch(authStarting());
+    return axios.post("register/", userInput).then(res => {
+      localStorage.setItem("advToken", res.data.key);
+      dispatch(authSuccess(res.data.key));
+    });
+  };
+}
+
 // export const advInit = dispatch => {
 //   dispatch({ type: actionTypes.ADV_INIT_STARTING });
 //   axios
@@ -80,3 +90,13 @@ export function handleLogin(userInput) {
 //     .catch(err => console.log(err.message));
 //   setUser(user => ({ ...user, token }));
 // };
+
+const actionExports = {
+  actionTypes,
+  logout,
+  checkLogin,
+  handleLogin,
+  handleRegister
+};
+
+export default actionExports;

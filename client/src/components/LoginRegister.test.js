@@ -1,13 +1,16 @@
 import React from "react";
 import { createStore } from "redux";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { Route } from "react-router-dom";
 import reducer from "../store/reducers";
 import LoginRegister from "./LoginRegister";
+import actionExports from "../store/actions";
 import { MemoryRouter } from "react-router";
-import { configure } from "enzyme";
+import { configure, mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { mount, shallow } from "enzyme";
+
+let { handleLogin, handleRegister } = actionExports;
+// jest.mock("react-redux");
 
 configure({ adapter: new Adapter() });
 
@@ -16,6 +19,9 @@ describe("test LoginRegister", () => {
     const emptyState = reducer();
     const reduxStore = createStore(() => emptyState);
     const mounted = mount(
+      // MemoryRouter provides context for Provider
+      // Invariant Violation: You should not use <Route> or withRouter() outside a <Router>
+      // https://github.com/airbnb/enzyme/issues/1112
       <MemoryRouter initialEntries={["/"]}>
         <Provider store={reduxStore}>
           <Route path={"/"} render={() => <LoginRegister />} />
@@ -25,6 +31,9 @@ describe("test LoginRegister", () => {
     return mounted;
   };
 
+  // *****************************
+  // ----test proper rendering----
+  // *****************************
   it("renders without crashing", () => {
     const mounted = mountIt();
     expect(mounted).toHaveLength(1);
@@ -54,58 +63,106 @@ describe("test LoginRegister", () => {
     expect(len).toEqual(2);
   });
 
-  // it('check entire form validation when the form is valid', () => {
-  //   let formSpy = spy();
-  //   const form = mount(<Form isFormValid={formSpy} />);
-  //   form.find('.name').simulate('change', { target: { value: 'sasrank' } });
-  //   form.find('.email').simulate('change', { target: { value: 'aasdbc@xyz.com' } });
-  //   form.find('.phone').simulate('change', { target: { value: '9856756756' } });
-  //   form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
-  //   form.find('.button').simulate('click');
-  //   expect(formSpy.calledWith(true)).toEqual(true);
-  // });
+  // ******************************
+  // ----test proper validation----
+  // ******************************
+  it("validates username field for login and register", () => {
+    const mounted = mountIt();
+    // check no error after render
+    let errText = mounted.find("div#usernameError").text();
+    expect(errText).toBe("");
 
-  // it('check entire form validation when the phone number is invalid', () => {
-  //   let formSpy = spy();
-  //   const form = mount(<Form isFormValid={formSpy} />);
-  //   form.find('.name').simulate('change', { target: { value: 'ui' } });
-  //   form.find('.email').simulate('change', { target: { value: 'abc@xyz.com' } });
-  //   form.find('.phone').simulate('change', { target: { value: '56756756' } });
-  //   form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
-  //   form.find('.button').simulate('click');
-  //   expect(formSpy.calledWith(true)).toEqual(false);
-  // });
+    // check no error with input
+    const input = mounted.find("input#username");
+    input.simulate("change", {
+      persist: () => {},
+      target: { name: "username", value: "anything" }
+    });
+    errText = mounted.find("div#usernameError").text();
+    expect(errText).toBe("");
 
-  // it('check entire form validation when the email is invalid', () => {
-  //   let formSpy = spy();
-  //   const form = mount(<Form isFormValid={formSpy} />);
-  //   form.find('.name').simulate('change', { target: { value: 'ui' } });
-  //   form.find('.email').simulate('change', { target: { value: 'abc@xyz.' } });
-  //   form.find('.phone').simulate('change', { target: { value: '56756756' } });
-  //   form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
-  //   form.find('.button').simulate('click');
-  //   expect(formSpy.calledWith(true)).toEqual(false);
-  // });
+    // check error if user does not provide username
+    input.simulate("change", {
+      persist: () => {},
+      target: { name: "username", value: "" }
+    });
+    errText = mounted.find("div#usernameError").text();
+    expect(errText).toContain("Username empty.");
+  });
 
-  // it('check entire form validation when the url is invalid', () => {
-  //   let formSpy = spy();
-  //   const form = mount(<Form isFormValid={formSpy} />);
-  //   form.find('.name').simulate('change', { target: { value: 'ui' } });
-  //   form.find('.email').simulate('change', { target: { value: 'abc@xyz.com' } });
-  //   form.find('.phone').simulate('change', { target: { value: '56756756' } });
-  //   form.find('.url').simulate('change', { target: { value: 'ht' } });
-  //   form.find('.button').simulate('click');
-  //   expect(formSpy.calledWith(true)).toEqual(false);
-  // });
+  it("validates password field for login", () => {
+    const mounted = mountIt();
 
-  // it('check form validation when the entire form is invalid', () => {
-  //   let formSpy = spy();
-  //   const form = mount(<Form isFormValid={formSpy} />);
-  //   form.find('.name').simulate('change', { target: { value: '' } });
-  //   form.find('.email').simulate('change', { target: { value: '33' } });
-  //   form.find('.phone').simulate('change', { target: { value: '567567560' } });
-  //   form.find('.url').simulate('change', { target: { value: 'h9' } });
-  //   form.find('.button').simulate('click');
-  //   expect(formSpy.calledWith(true)).toEqual(false);
+    // check no error after render
+    let errTextPWD = mounted.find("div#passwordError").text();
+    expect(errTextPWD).toBe("");
+
+    // check no error with input
+    const input = mounted.find("input#password");
+    input.simulate("change", {
+      persist: () => {},
+      target: { name: "password", value: "any pass" }
+    });
+    errTextPWD = mounted.find("div#passwordError").text();
+    expect(errTextPWD).toBe("");
+
+    // check error for empty input
+    input.simulate("change", {
+      persist: () => {},
+      target: { name: "password", value: "" }
+    });
+    errTextPWD = mounted.find("div#passwordError").text();
+    expect(errTextPWD).toBe("Password empty.");
+  });
+
+  it("validates password fields for register", () => {
+    const mounted = mountIt();
+
+    // select register
+    mounted.find({ name: "isLogin" }).simulate("click");
+
+    // check no error after render
+    let errTextPWD = mounted.find("div#passwordError").text();
+    let errTextPWD2 = mounted.find("div#password2Error").text();
+    expect(errTextPWD).toBe("");
+    expect(errTextPWD2).toBe("");
+
+    // check error for mismatched passwords
+    const inputPassword = mounted.find("input#password");
+    const inputPassword2 = mounted.find("input#password2");
+    inputPassword.simulate("change", {
+      persist: () => {},
+      target: { name: "password", value: "any pass" }
+    });
+    inputPassword2.simulate("change", {
+      persist: () => {},
+      target: { name: "password2", value: "mismatched" }
+    });
+    errTextPWD2 = mounted.find("div#password2Error").text();
+    expect(errTextPWD2).toBe("Passwords do not match.");
+
+    // check no error when passwords match
+    inputPassword2.simulate("change", {
+      persist: () => {},
+      target: { name: "password2", value: "any pass" }
+    });
+    errTextPWD2 = mounted.find("div#password2Error").text();
+    expect(errTextPWD2).toBe("");
+  });
+
+  // ******************************
+  // ----test proper submitting----
+  // ******************************
+
+  // it("dispatches login on login", () => {
+  //   useDispatch.mockImplementation(() => cb => cb());
+  //   handleLogin = jest.fn().mockResolvedValue({ data: "key" });
+  //   const mounted = mountIt();
+  //   mounted.find("form").simulate("submit", { preventDefault: () => {} });
+
+  //   expect(handleLogin).toHaveBeenLastCalledWith({
+  //     username: "",
+  //     password: ""
+  //   });
   // });
 });

@@ -6,7 +6,9 @@ import styled from "styled-components";
 import Adv from "./Adv";
 import LoginRegister from "./LoginRegister";
 
-import { checkLogin } from "../store/actions";
+import actionExports from "../store/actions";
+
+const { checkLogin } = actionExports;
 
 const AppContainer = styled.div`
   display: flex;

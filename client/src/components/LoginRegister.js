@@ -2,11 +2,12 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import axios from "../axios-instance";
 
 import useLoginForm from "../hooks/useLoginForm";
 
-import { handleLogin } from "../store/actions";
+import actionExports from "../store/actions";
+
+const { handleLogin, handleRegister } = actionExports;
 
 const FormError = styled.div`
   color: red;
@@ -17,8 +18,8 @@ const LoginRegister = props => {
   const dispatch = useDispatch();
   const authLoading = useSelector(state => state.auth.loading);
   authLoading && console.log("authLoading: ", authLoading);
+
   // handle form submit:
-  // dispatch = 1;
   const onLoginRegister = async inputs => {
     // handle login/register form submit
     if (inputs.isLogin) {
@@ -36,9 +37,7 @@ const LoginRegister = props => {
       // "/register" is expecting "password1" instead of "password"
       const fmtInputs = { ...inputs, password1: inputs.password };
       try {
-        const res = await axios.post("registration/", fmtInputs);
-        // console.log(res.data);
-        handleLogin(res.data);
+        await dispatch(handleRegister(fmtInputs));
         props.history.push("/adv");
       } catch (err) {
         console.log("caught onLoginRegister", err.message);
@@ -60,12 +59,12 @@ const LoginRegister = props => {
   );
 
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <button
         name="isLogin"
         value={inputs.isLogin}
         onClick={e => {
-          // e.preventDefault();  // need this if this button moves inside the form..
+          e.preventDefault(); // need this if this button moves inside the form..
           handleInput({
             target: { name: "isLogin", value: !inputs.isLogin },
             persist: () => {}
@@ -74,46 +73,47 @@ const LoginRegister = props => {
       >
         {inputs.isLogin ? "New? Register!" : "have acct? Login!"}
       </button>
-      <form onSubmit={handleSubmit}>
+      <div>
+        <label>Username: </label>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          onChange={handleInput}
+          value={inputs.username}
+        />
+        <FormError id="usernameError">{errors.username}</FormError>
+      </div>
+      <div>
+        <label>Password: </label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          onChange={handleInput}
+          value={inputs.password}
+        />
+        <FormError id="passwordError">{errors.password}</FormError>
+      </div>
+      {!inputs.isLogin && (
         <div>
-          <label>Username: </label>
+          <label>Confirm Password: </label>
           <input
-            type="text"
-            name="username"
-            onChange={handleInput}
-            value={inputs.username}
-          />
-          <FormError>{errors.username}</FormError>
-        </div>
-        <div>
-          <label>Password: </label>
-          <input
+            id="password2"
             type="password"
-            name="password"
+            name="password2"
             onChange={handleInput}
-            value={inputs.password}
+            value={inputs.password2}
           />
-          <FormError>{errors.password}</FormError>
+          <FormError id="password2Error">{errors.password2}</FormError>
         </div>
-        {!inputs.isLogin && (
-          <div>
-            <label>Confirm Password: </label>
-            <input
-              type="password"
-              name="password2"
-              onChange={handleInput}
-              value={inputs.password2}
-            />
-            <FormError>{errors.password2}</FormError>
-          </div>
-        )}
-        <button disabled={disabled || authLoading} type="submit">
-          {inputs.isLogin ? "Log in" : "Register"}
-        </button>
-        <FormError>{errors.submitError}</FormError>
-        {/* <FormError>{authError && authErrorMsg[authError]}</FormError> */}
-      </form>
-    </div>
+      )}
+      <button disabled={disabled || authLoading} type="submit">
+        {inputs.isLogin ? "Log in" : "Register"}
+      </button>
+      <FormError>{errors.submitError}</FormError>
+      {/* <FormError>{authError && authErrorMsg[authError]}</FormError> */}
+    </form>
   );
 };
 
