@@ -18,6 +18,7 @@ const LoginRegister = props => {
   const authLoading = useSelector(state => state.auth.loading);
   authLoading && console.log("authLoading: ", authLoading);
   // handle form submit:
+  // dispatch = 1;
   const onLoginRegister = async inputs => {
     // handle login/register form submit
     if (inputs.isLogin) {
