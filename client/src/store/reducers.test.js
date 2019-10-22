@@ -3,16 +3,36 @@ import actionExports from "./actions";
 
 const { actionTypes } = actionExports;
 
-const createUser = ({ username = "", uuid = "" } = {}) => ({ username, uuid });
-
 const createAuth = ({
   token = "",
-  user = createUser(),
+  username = "",
   loading = false,
   error = null
-} = {}) => ({ token, user, loading, error });
+} = {}) => ({ token, username, loading, error });
 
-const createAdv = ({ loading = false, error = null } = {}) => ({
+//{"uuid": "c3ee7f04-5137-427e-8591-7fcf0557dd7b", "name": "testuser", "title": "Outside Cave Entrance", "description": "North of you, the cave mount beckons", "players": []}
+// const advData = ({
+//   uuid = "",
+//   name = "",
+//   title = "",
+//   description = "",
+//   players = []
+// } = {}) => ({ uuid, name, title, description, players });
+
+const createAdv = ({
+  uuid = "",
+  name = "",
+  title = "",
+  description = "",
+  players = [],
+  loading = false,
+  error = null
+} = {}) => ({
+  uuid,
+  name,
+  title,
+  description,
+  players,
   loading,
   error
 });
@@ -32,13 +52,22 @@ describe("test combined reducer", () => {
     expect(actual).toEqual(expected);
   });
 });
+// ***************************
+// -------auth reducer -------
+// ***************************
 
 describe("test auth reducer", () => {
-  it("sets loading: true on AUTH_STARTING", () => {
+  it("sets loading: true on AUTH_STARTING, reset error", () => {
     const action = {
       type: actionTypes.AUTH_STARTING
     };
-    const actual = reducer(createState(), action);
+    const actual = reducer(
+      {
+        ...createState(),
+        auth: { ...createAuth(), loading: false, error: "prev error" }
+      },
+      action
+    );
     const expected = {
       ...createState(),
       auth: {
@@ -109,8 +138,73 @@ describe("test auth reducer", () => {
     expect(actual).toEqual(expected);
   });
 });
-
+// ***************************
+// -------adv reducer -------
+// ***************************
 describe("test adv reducer", () => {
+  it("sets loading: true on ADV_INIT_STARTING, resets error", () => {
+    const action = {
+      type: actionTypes.ADV_INIT_STARTING
+    };
+    const actual = reducer(
+      {
+        ...createState(),
+        adv: { ...createAdv(), loading: false, error: "prev error" }
+      },
+      action
+    );
+    const expected = {
+      ...createState(),
+      adv: {
+        ...createAdv(),
+        loading: true
+      }
+    };
+    expect(actual).toEqual(expected);
+  });
+  it("sets adv data correctly and sets loading: false on ADV_INIT_SUCCESS", () => {
+    const action = {
+      type: actionTypes.ADV_INIT_SUCCESS,
+      payload: {
+        uuid: "uuid",
+        name: "user's name",
+        title: "room title",
+        description: "description",
+        players: [],
+        loading: true
+      }
+    };
+    const actual = reducer(createState(), action);
+    const expected = {
+      ...createState(),
+      adv: {
+        uuid: "uuid",
+        name: "user's name",
+        title: "room title",
+        description: "description",
+        players: [],
+        loading: false,
+        error: null
+      }
+    };
+    expect(actual).toEqual(expected);
+  });
+  it("sets error and sets loading: false on ADV_INIT_FAIL", () => {
+    const action = {
+      type: actionTypes.ADV_INIT_FAIL,
+      payload: "error message"
+    };
+    const actual = reducer(createState(), action);
+    const expected = {
+      ...createState(),
+      adv: {
+        ...createAdv(),
+        loading: false,
+        error: "error message"
+      }
+    };
+    expect(actual).toEqual(expected);
+  });
   it("resets initial ADV state on LOGOUT", () => {
     const action = { type: actionTypes.LOGOUT };
     const actual = reducer(

@@ -5,18 +5,15 @@ exports[`renders without crashing 1`] = `
   value={null}
 >
   <App
+    advInit={[Function]}
     auth={
       Object {
         "error": null,
         "loading": false,
         "token": "",
-        "user": Object {
-          "username": "",
-          "uuid": "",
-        },
+        "username": "",
       }
     }
-    checkLogin={[Function]}
     dispatch={[MockFunction]}
     store={
       Object {

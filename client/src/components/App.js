@@ -8,7 +8,7 @@ import LoginRegister from "./LoginRegister";
 
 import actionExports from "../store/actions";
 
-const { checkLogin } = actionExports;
+const { advInit } = actionExports;
 
 const AppContainer = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const PrivateRoute = ({ component, token, ...options }) => {
 
 function App(props) {
   // protect routes from user w/o token
-  const { auth, checkLogin } = props;
+  const { auth, advInit } = props;
   const token = auth.token;
   const history = useHistory();
   // if no token, check local storage for existing token
@@ -40,9 +40,9 @@ function App(props) {
     // will redirect to /adv if token is found
     // need to pass in history and location to achieve this since token is not set, a redirect to "/" will render this time
     // NOTE: could employ useLocation to do this dynamically
-    checkLogin("/adv", history);
+    advInit("/adv", history);
   }
-  // checkLogin(props.dispatch);
+  // advInit(props.dispatch);
   let routes = (
     <Switch>
       <Route exact path="/" component={LoginRegister} />
@@ -58,7 +58,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  checkLogin
+  advInit
 };
 
 export default connect(

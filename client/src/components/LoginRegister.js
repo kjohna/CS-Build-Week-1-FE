@@ -8,7 +8,7 @@ import useLoginForm from "../hooks/useLoginForm";
 
 import actionExports from "../store/actions";
 
-const { handleLogin, handleRegister, checkLogin } = actionExports;
+const { handleLogin, handleRegister, advInit } = actionExports;
 
 const FormError = styled.div`
   color: red;
@@ -23,7 +23,7 @@ export const onLoginRegister = async (inputs, dispatch, history) => {
       // console.log("onLoginRegister");
       await dispatch(handleLogin(inputs));
       // this handles redirect when a token is present
-      dispatch(checkLogin("/adv", history));
+      dispatch(advInit("/adv", history));
       console.log("handleLogin success");
     } catch (err) {
       console.log("caught onLoginRegister - component", err.message);
@@ -36,7 +36,7 @@ export const onLoginRegister = async (inputs, dispatch, history) => {
     try {
       await dispatch(handleRegister(fmtInputs));
       // this handles redirect when a token is present
-      dispatch(checkLogin("/adv", history));
+      dispatch(advInit("/adv", history));
       console.log("handleRegister success");
     } catch (err) {
       console.log("caught onLoginRegister", err.message);

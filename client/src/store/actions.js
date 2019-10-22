@@ -10,7 +10,9 @@ const actionTypes = {
   LOGOUT: "LOGOUT"
 };
 
-// actions
+// *****************************
+// -------actions-------
+// *****************************
 function authStarting() {
   return { type: actionTypes.AUTH_STARTING };
 }
@@ -34,23 +36,9 @@ function logout() {
   return { type: actionTypes.LOGOUT };
 }
 
-// action creators
-function checkLogin(location, history) {
-  return function(dispatch) {
-    const token = localStorage.getItem("advToken");
-    dispatch(authStarting());
-    if (token) {
-      // Protected routes automatically render a redirect to "/"
-      // need to undo this if we find a token
-      console.log("checkLogin success, dispatch authSuccess");
-      dispatch(authSuccess(token));
-      history.push(location);
-    } else {
-      dispatch(authFail("No active session."));
-    }
-  };
-}
-
+// *****************************
+// -------action creators-------
+// *****************************
 function handleLogin(userInput) {
   return async dispatch => {
     dispatch(authStarting());
@@ -80,21 +68,29 @@ function handleRegister(userInput) {
   };
 }
 
-// export const advInit = dispatch => {
-//   dispatch({ type: actionTypes.ADV_INIT_STARTING });
-//   axios
-//     .get("adv/init/")
-//     .then(res => {
-//       console.log(res.data);
-//     })
-//     .catch(err => console.log(err.message));
-//   setUser(user => ({ ...user, token }));
-// };
+function advInit(location, history) {
+  // check for active session (token in local storage)
+  // if found, get adv data & redirect to requested location
+  return function(dispatch) {
+    const token = localStorage.getItem("advToken");
+    dispatch(authStarting());
+    if (token) {
+      // Protected routes automatically render a redirect to "/"
+      // need to undo this if we find a token
+      dispatch(authSuccess(token));
+      // start request to init/ here
+      console.log("advInit found, start init");
+      history.push(location);
+    } else {
+      dispatch(authFail("No active session."));
+    }
+  };
+}
 
 const actionExports = {
   actionTypes,
   logout,
-  checkLogin,
+  advInit,
   handleLogin,
   handleRegister
 };
