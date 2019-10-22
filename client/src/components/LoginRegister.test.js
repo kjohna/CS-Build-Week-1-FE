@@ -4,12 +4,11 @@ import { Provider, useDispatch } from "react-redux";
 import { Route } from "react-router-dom";
 import reducer from "../store/reducers";
 import LoginRegister from "./LoginRegister";
-import actionExports from "../store/actions";
+import * as loginHelpers from "./LoginRegister";
 import { MemoryRouter } from "react-router";
 import { configure, mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 
-let { handleLogin, handleRegister } = actionExports;
 // jest.mock("react-redux");
 
 configure({ adapter: new Adapter() });
@@ -154,15 +153,51 @@ describe("test LoginRegister", () => {
   // ----test proper submitting----
   // ******************************
 
-  // it("dispatches login on login", () => {
-  //   useDispatch.mockImplementation(() => cb => cb());
-  //   handleLogin = jest.fn().mockResolvedValue({ data: "key" });
-  //   const mounted = mountIt();
-  //   mounted.find("form").simulate("submit", { preventDefault: () => {} });
+  it("dispatches login on login", () => {
+    const spy = jest.spyOn(loginHelpers, "onLoginRegister");
+    spy.mockImplementation(() => {});
+    const mounted = mountIt();
+    const defaultInputs = {
+      username: "",
+      password: "",
+      password2: "",
+      isLogin: true, // looking for this
+      error: false
+    };
+    // "click" submit
+    mounted.find("form").simulate("submit", { preventDefault: () => {} });
 
-  //   expect(handleLogin).toHaveBeenLastCalledWith({
-  //     username: "",
-  //     password: ""
-  //   });
-  // });
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenLastCalledWith(
+      { ...defaultInputs },
+      expect.any(Function),
+      expect.any(Object)
+    );
+    spy.mockRestore();
+  });
+
+  it("dispatches register on register", () => {
+    const spy = jest.spyOn(loginHelpers, "onLoginRegister");
+    spy.mockImplementation(() => {});
+    const mounted = mountIt();
+    const defaultInputs = {
+      username: "",
+      password: "",
+      password2: "",
+      isLogin: false, // looking for this
+      error: false
+    };
+    // select register
+    mounted.find({ name: "isLogin" }).simulate("click");
+    // "click" submit
+    mounted.find("form").simulate("submit", { preventDefault: () => {} });
+
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenLastCalledWith(
+      { ...defaultInputs },
+      expect.any(Function),
+      expect.any(Object)
+    );
+    spy.mockRestore();
+  });
 });

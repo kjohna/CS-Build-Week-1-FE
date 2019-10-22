@@ -1,54 +1,60 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
+import { withRouter, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 
+import * as loginHelpers from "./LoginRegister";
 import useLoginForm from "../hooks/useLoginForm";
 
 import actionExports from "../store/actions";
 
-const { handleLogin, handleRegister } = actionExports;
+const { handleLogin, handleRegister, checkLogin } = actionExports;
 
 const FormError = styled.div`
   color: red;
 `;
 
+// handle form submit
+// this is exported here for testing to allow mock
+export const onLoginRegister = async (inputs, dispatch, history) => {
+  // handle login/register form submit
+  if (inputs.isLogin) {
+    try {
+      // console.log("onLoginRegister");
+      await dispatch(handleLogin(inputs));
+      // this handles redirect when a token is present
+      dispatch(checkLogin("/adv", history));
+      console.log("handleLogin success");
+    } catch (err) {
+      console.log("caught onLoginRegister - component", err.message);
+      // re-throw error so that useLoginForm will catch and handle
+      throw err;
+    }
+  } else {
+    // "/register" is expecting "password1" instead of "password"
+    const fmtInputs = { ...inputs, password1: inputs.password };
+    try {
+      await dispatch(handleRegister(fmtInputs));
+      // this handles redirect when a token is present
+      dispatch(checkLogin("/adv", history));
+      console.log("handleRegister success");
+    } catch (err) {
+      console.log("caught onLoginRegister", err.message);
+      // re-throw error so that useLoginForm will catch and handle
+      throw err;
+    }
+  }
+};
+
 const LoginRegister = props => {
   // grab dispatch, onLoginRegister will dispatch appropriate action
   const dispatch = useDispatch();
+  const history = useHistory();
   const authLoading = useSelector(state => state.auth.loading);
-  authLoading && console.log("authLoading: ", authLoading);
-
-  // handle form submit:
-  const onLoginRegister = async inputs => {
-    // handle login/register form submit
-    if (inputs.isLogin) {
-      try {
-        // console.log("onLoginRegister");
-        await dispatch(handleLogin(inputs));
-        console.log("handleLogin done");
-        props.history.push("/adv");
-      } catch (err) {
-        console.log("caught onLoginRegister - component", err.message);
-        // re-throw error so that useLoginForm will catch and handle
-        throw err;
-      }
-    } else {
-      // "/register" is expecting "password1" instead of "password"
-      const fmtInputs = { ...inputs, password1: inputs.password };
-      try {
-        await dispatch(handleRegister(fmtInputs));
-        props.history.push("/adv");
-      } catch (err) {
-        console.log("caught onLoginRegister", err.message);
-        // re-throw error so that useLoginForm will catch and handle
-        throw err;
-      }
-    }
-  };
-
+  // authLoading && console.log("authLoading: ", authLoading);
   const { inputs, errors, disabled, handleInput, handleSubmit } = useLoginForm(
-    onLoginRegister,
+    // reimporting allows for mocking
+    () => loginHelpers.onLoginRegister(inputs, dispatch, history),
     {
       username: "",
       password: "",
