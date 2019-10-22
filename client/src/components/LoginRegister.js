@@ -23,7 +23,7 @@ export const onLoginRegister = async (inputs, dispatch, history) => {
       // console.log("onLoginRegister");
       await dispatch(handleLogin(inputs));
       // this handles redirect when a token is present
-      dispatch(advInit("/adv", history));
+      await dispatch(advInit("/adv", history));
       console.log("handleLogin success");
     } catch (err) {
       console.log("caught onLoginRegister - component", err.message);
@@ -36,7 +36,7 @@ export const onLoginRegister = async (inputs, dispatch, history) => {
     try {
       await dispatch(handleRegister(fmtInputs));
       // this handles redirect when a token is present
-      dispatch(advInit("/adv", history));
+      await dispatch(advInit("/adv", history));
       console.log("handleRegister success");
     } catch (err) {
       console.log("caught onLoginRegister", err.message);
@@ -46,12 +46,13 @@ export const onLoginRegister = async (inputs, dispatch, history) => {
   }
 };
 
-const LoginRegister = props => {
+const LoginRegister = () => {
   // grab dispatch, onLoginRegister will dispatch appropriate action
   const dispatch = useDispatch();
+  // onLoginRegister passes history object to handleLogin or handleRegister actions which redirect on success
   const history = useHistory();
   const authLoading = useSelector(state => state.auth.loading);
-  // authLoading && console.log("authLoading: ", authLoading);
+  const advLoading = useSelector(state => state.adv.loading);
   const { inputs, errors, disabled, handleInput, handleSubmit } = useLoginForm(
     // reimporting allows for mocking
     () => loginHelpers.onLoginRegister(inputs, dispatch, history),
@@ -114,11 +115,12 @@ const LoginRegister = props => {
           <FormError id="password2Error">{errors.password2}</FormError>
         </div>
       )}
-      <button disabled={disabled || authLoading} type="submit">
+      <button disabled={disabled || authLoading || advLoading} type="submit">
         {inputs.isLogin ? "Log in" : "Register"}
       </button>
       <FormError>{errors.submitError}</FormError>
-      {/* <FormError>{authError && authErrorMsg[authError]}</FormError> */}
+      <div>{authLoading && "AUTH LOADING"}</div>
+      <div>{advLoading && "ADV LOADING"}</div>
     </form>
   );
 };
