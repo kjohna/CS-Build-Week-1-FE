@@ -31,6 +31,24 @@ function authFail(err) {
   };
 }
 
+function advInitStarting() {
+  return { type: actionTypes.ADV_INIT_STARTING };
+}
+
+function advInitSuccess(advData) {
+  return {
+    type: actionTypes.ADV_INIT_SUCCESS,
+    payload: advData
+  };
+}
+
+function advInitFail(err) {
+  return {
+    type: actionTypes.ADV_INIT_FAIL,
+    payload: err
+  };
+}
+
 function logout() {
   localStorage.removeItem("advToken");
   return { type: actionTypes.LOGOUT };
@@ -50,7 +68,6 @@ function handleLogin(userInput) {
         dispatch(authSuccess(res.data.key));
       })
       .catch(err => {
-        console.log("caught onLoginRegister - actions", err.message);
         dispatch(authFail(err.message));
         // re-throw error so that useLoginForm will catch and handle
         throw err;
@@ -61,10 +78,16 @@ function handleLogin(userInput) {
 function handleRegister(userInput) {
   return async dispatch => {
     dispatch(authStarting());
-    return axios.post("register/", userInput).then(res => {
-      localStorage.setItem("advToken", res.data.key);
-      dispatch(authSuccess(res.data.key));
-    });
+    return axios
+      .post("registration/", userInput)
+      .then(res => {
+        localStorage.setItem("advToken", res.data.key);
+        dispatch(authSuccess(res.data.key));
+      })
+      .catch(err => {
+        dispatch(authFail(err.message));
+        throw err;
+      });
   };
 }
 
@@ -79,8 +102,16 @@ function advInit(location, history) {
       // need to undo this if we find a token
       dispatch(authSuccess(token));
       // start request to init/ here
-      console.log("advInit found, start init");
-      history.push(location);
+      dispatch(advInitStarting());
+      return axios
+        .get("adv/init/")
+        .then(res => {
+          dispatch(advInitSuccess(res.data));
+          history.push(location);
+        })
+        .catch(err => {
+          dispatch(advInitFail(err.message));
+        });
     } else {
       dispatch(authFail("No active session."));
     }

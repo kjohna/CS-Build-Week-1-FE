@@ -3,21 +3,11 @@ import actionExports from "./actions";
 
 const { actionTypes } = actionExports;
 
-const createAuth = ({
-  token = "",
-  username = "",
-  loading = false,
-  error = null
-} = {}) => ({ token, username, loading, error });
-
-//{"uuid": "c3ee7f04-5137-427e-8591-7fcf0557dd7b", "name": "testuser", "title": "Outside Cave Entrance", "description": "North of you, the cave mount beckons", "players": []}
-// const advData = ({
-//   uuid = "",
-//   name = "",
-//   title = "",
-//   description = "",
-//   players = []
-// } = {}) => ({ uuid, name, title, description, players });
+const createAuth = ({ token = "", loading = false, error = null } = {}) => ({
+  token,
+  loading,
+  error
+});
 
 const createAdv = ({
   uuid = "",

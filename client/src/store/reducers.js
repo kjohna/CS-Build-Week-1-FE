@@ -5,7 +5,6 @@ const { actionTypes } = actionExports;
 // initial auth state
 const initialAuth = {
   token: "",
-  username: "",
   loading: false,
   error: null
 };
