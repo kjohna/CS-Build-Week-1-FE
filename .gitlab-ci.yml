@@ -1,0 +1,45 @@
+#https://gist.github.com/Mazuh/4b7a275ded38e2e031a5d40e28d1984d
+image: node:12.5.0
+
+before_script:
+  - cd client/
+
+stages:
+  - install
+  - test
+  - deploy
+
+install:
+  stage: install
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - public # mandatory, other folder won't work
+  only:
+    - master # or dev, the branch you want to publish
+    - working
+
+testing:
+  stage: test
+  dependencies: ["install"]
+  script:
+    - npm install
+    - npm run build
+    - npm test
+  artifacts:
+    paths:
+      - public # mandatory, other folder won't work
+  only:
+    - master # or dev, the branch you want to publish
+    - working
+
+deploying:
+  stage: deploy
+  only:
+    - master
+  dependencies: ["install", "testing"]
+  script:
+    - npm install
+    - npm run build
+    - npm start
