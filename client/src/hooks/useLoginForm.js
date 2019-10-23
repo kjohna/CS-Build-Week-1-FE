@@ -11,7 +11,7 @@ const useLoginForm = (cb, defaults) => {
     if (e) {
       e.preventDefault();
     }
-    console.log("handleSubmit, e preventDefaulted");
+    // console.log("handleSubmit, e preventDefaulted");
     try {
       await cb(inputs);
     } catch (err) {
