@@ -65,6 +65,12 @@ function handleLogin(userInput) {
       .post("login/", userInput)
       .then(res => {
         localStorage.setItem("advToken", res.data.key);
+        // MUST add token to all headers of subsequent axios calls
+        // since advInit will be called immediately after any previous
+        // user logged in since refresh will be init-ed with prev user's token
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Token ${res.data.key}`;
         dispatch(authSuccess(res.data.key));
       })
       .catch(err => {
@@ -82,6 +88,12 @@ function handleRegister(userInput) {
       .post("registration/", userInput)
       .then(res => {
         localStorage.setItem("advToken", res.data.key);
+        // MUST add token to all headers of subsequent axios calls
+        // since advInit will be called immediately after any previous
+        // user logged in since refresh will be init-ed with prev user's token
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Token ${res.data.key}`;
         dispatch(authSuccess(res.data.key));
       })
       .catch(err => {

@@ -7,7 +7,7 @@ import actionExports from "../store/actions";
 const { logout } = actionExports;
 
 const Adv = props => {
-  const { user, token } = props;
+  const { token } = props;
   // uuid: "1234",
   // name: "testuser",
   // title: "room title",
@@ -16,7 +16,6 @@ const Adv = props => {
   // loading: false,
   // error: null
   const { name, title, description, players } = useSelector(state => state.adv);
-  console.log(user);
   if (!token) {
     return <Link to="/">Must Log in</Link>;
   }
