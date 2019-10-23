@@ -39,3 +39,6 @@ deploying:
     - install
     - testing
   script:
+    - npm install
+    - npm run build
+    - npm start
