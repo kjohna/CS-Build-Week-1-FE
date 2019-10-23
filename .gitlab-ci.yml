@@ -6,17 +6,9 @@ before_script:
   - cd client/
 
 stages:
-  - setup
   - install
   - build
   - test
-
-setup:
-  stage: setup
-  script:
-    - npm ci
-  only:
-    - master
 
 install:
   stage: install
