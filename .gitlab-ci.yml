@@ -1,6 +1,9 @@
 #https://gist.github.com/Mazuh/4b7a275ded38e2e031a5d40e28d1984d
 image: node:12.5.0
 
+before_script:
+  - cd client/
+
 stages:
   - install
   - test
