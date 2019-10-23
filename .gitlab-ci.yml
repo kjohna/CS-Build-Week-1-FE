@@ -9,7 +9,7 @@ stages:
 install:
   stage: install
   script:
-    - "npm install"
+    - npm install
   artifacts:
     paths:
       - public # mandatory, other folder won't work
@@ -19,11 +19,11 @@ install:
 
 testing:
   stage: test
-  dependencies: install
+  dependencies: ["install"]
   script:
-    - "npm install"
-    - "npm run build"
-    - "npm test"
+    - npm install
+    - npm run build
+    - npm test
   artifacts:
     paths:
       - public # mandatory, other folder won't work
@@ -35,10 +35,8 @@ deploying:
   stage: deploy
   only:
     - master
-  dependencies:
-    - install
-    - testing
+  dependencies: ["install", "testing"]
   script:
-    - "npm install"
-    - "npm run build"
-    - "npm start"
+    - npm install
+    - npm run build
+    - npm start
