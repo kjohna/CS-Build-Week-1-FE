@@ -76,6 +76,25 @@ const adv = (state = initialAdv, action = {}) => {
     case actionTypes.LOGOUT:
       // not much happening here for now, but maybe a good place for fancy stuff in the future? maybe caching some state?
       return { ...initialAdv };
+    case actionTypes.ADV_MOVE_STARTING:
+      return {
+        ...state,
+        loading: true,
+        error: null
+      };
+    case actionTypes.ADV_MOVE_SUCCESS:
+      return {
+        ...state,
+        ...action.payload,
+        loading: false,
+        error: null
+      };
+    case actionTypes.ADV_MOVE_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      };
     default:
       return state;
   }

@@ -7,7 +7,10 @@ const actionTypes = {
   ADV_INIT_STARTING: "ADV_INIT_STARTING",
   ADV_INIT_SUCCESS: "ADV_INIT_SUCCESS",
   ADV_INIT_FAIL: "ADV_INIT_FAIL",
-  LOGOUT: "LOGOUT"
+  LOGOUT: "LOGOUT",
+  ADV_MOVE_STARTING: "ADV_MOVE_STARTING",
+  ADV_MOVE_SUCCESS: "ADV_MOVE_SUCCESS",
+  ADV_MOVE_FAIL: "ADV_MOVE_FAIL"
 };
 
 // *****************************
@@ -52,6 +55,24 @@ function advInitFail(err) {
 function logout() {
   localStorage.removeItem("advToken");
   return { type: actionTypes.LOGOUT };
+}
+
+function advMoveStarting() {
+  return { type: actionTypes.ADV_MOVE_STARTING };
+}
+
+function advMoveSuccess(advData) {
+  return {
+    type: actionTypes.ADV_MOVE_SUCCESS,
+    payload: advData
+  };
+}
+
+function advMoveFail(err) {
+  return {
+    type: actionTypes.ADV_MOVE_FAIL,
+    payload: err
+  };
 }
 
 // *****************************
@@ -130,12 +151,36 @@ function advInit(location, history) {
   };
 }
 
+function advMove(direction) {
+  // direction should be valid, checked by moveControls rendering and reducer tests
+  return function(dispatch) {
+    dispatch(advMoveStarting);
+    const data = { direction };
+    console.log("posting: ", data);
+    return axios
+      .post("adv/move/", data)
+      .then(res => {
+        // Note: a successful response is sent even if an invalid direction is passed. Won't happen with the code the way it is now but handle here anyway:
+        if (res.data.error_msg) {
+          dispatch(advMoveFail(res.data.error_msg));
+        } else {
+          dispatch(advMoveSuccess(res.data));
+        }
+      })
+      .catch(err => {
+        console.log(err.message);
+        dispatch(advMoveFail(err.message));
+      });
+  };
+}
+
 const actionExports = {
   actionTypes,
   logout,
   advInit,
   handleLogin,
-  handleRegister
+  handleRegister,
+  advMove
 };
 
 export default actionExports;

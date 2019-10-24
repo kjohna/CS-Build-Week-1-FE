@@ -1,14 +1,19 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect, useSelector } from "react-redux";
+import styled from "styled-components";
 
 import actionExports from "../store/actions";
 
-const { logout } = actionExports;
+const { logout, advMove } = actionExports;
 
-const Adv = props => {
+const AdvError = styled.div`
+  color: red;
+`;
+
+export const Adv = props => {
   const { token } = props;
-  const { name, title, description, players, exits } = useSelector(
+  const { name, title, description, players, exits, error } = useSelector(
     state => state.adv
   );
   if (!token) {
@@ -20,11 +25,13 @@ const Adv = props => {
     return (
       <div id="moveControls">
         {possibleExits.map(possibleExit => {
+          const active = exits.includes(possibleExit);
           return (
             <button
               id={`${possibleExit}MoveControl`}
               key={`${possibleExit}MoveControl`}
-              disabled={!exits.includes(possibleExit)}
+              onClick={active ? () => props.advMove(possibleExit) : undefined}
+              disabled={!active}
             >
               {possibleExit}
             </button>
@@ -35,7 +42,7 @@ const Adv = props => {
   };
   return (
     <div>
-      <div>TOKEN: {token}</div>
+      <AdvError id="advError">{error}</AdvError>
       <div id="playerName">Player: {name}</div>
       <div id="roomInfo">
         Room: {title}
@@ -53,7 +60,7 @@ const mapStateToProps = state => ({
   token: state.auth.token
 });
 
-const mapDispatchToProps = { logout };
+const mapDispatchToProps = { logout, advMove };
 
 export default withRouter(
   connect(

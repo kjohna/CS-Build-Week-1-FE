@@ -188,7 +188,10 @@ describe("test adv reducer", () => {
       type: actionTypes.ADV_INIT_FAIL,
       payload: "error message"
     };
-    const actual = reducer(createState(), action);
+    const actual = reducer(
+      { ...createState(), adv: { ...createAdv(), loading: true } },
+      action
+    );
     const expected = {
       ...createState(),
       adv: {
@@ -212,6 +215,74 @@ describe("test adv reducer", () => {
     );
     const expected = {
       ...createState()
+    };
+    expect(actual).toEqual(expected);
+  });
+  // {"name": "testuser", "title": "Foyer", "description": "Dim light filters in from the south. Dusty\npassages run north and east.", "players": [], "error_msg": ""}
+  it("sets loading, clears error on ADV_MOVE_STARTING", () => {
+    const action = {
+      type: actionTypes.ADV_MOVE_STARTING
+    };
+    const actual = reducer(
+      {
+        ...createState(),
+        adv: { ...createAdv(), loading: false, error: "prev error" }
+      },
+      action
+    );
+    const expected = {
+      ...createState(),
+      adv: {
+        ...createAdv(),
+        loading: true
+      }
+    };
+    expect(actual).toEqual(expected);
+  });
+  it("sets loading false, updates adv state on ADV_MOVE_SUCCESS", () => {
+    const action = {
+      type: actionTypes.ADV_MOVE_SUCCESS,
+      payload: {
+        uuid: "1234",
+        name: "user name",
+        title: "room title",
+        players: ["other player"],
+        description: "new room description",
+        exits: ["s"]
+      }
+    };
+    const actual = reducer(createState(), action);
+    const expected = {
+      ...createState(),
+      adv: {
+        uuid: "1234",
+        name: "user name",
+        title: "room title",
+        players: ["other player"],
+        exits: ["s"],
+        description: "new room description",
+        loading: false,
+        error: null
+      }
+    };
+    expect(actual).toEqual(expected);
+  });
+  it("sets error and sets loading: false for unsuccessful move", () => {
+    const action = {
+      type: actionTypes.ADV_MOVE_FAIL,
+      payload: "error message"
+    };
+    const actual = reducer(
+      { ...createState(), adv: { ...createAdv(), loading: true } },
+      action
+    );
+    const expected = {
+      ...createState(),
+      adv: {
+        ...createAdv(),
+        loading: false,
+        error: "error message"
+      }
     };
     expect(actual).toEqual(expected);
   });
