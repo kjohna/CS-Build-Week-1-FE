@@ -8,17 +8,31 @@ const { logout } = actionExports;
 
 const Adv = props => {
   const { token } = props;
-  // uuid: "1234",
-  // name: "testuser",
-  // title: "room title",
-  // description: "room description",
-  // players: ["player1", "player2"],
-  // loading: false,
-  // error: null
-  const { name, title, description, players } = useSelector(state => state.adv);
+  const { name, title, description, players, exits } = useSelector(
+    state => state.adv
+  );
   if (!token) {
     return <Link to="/">Must Log in</Link>;
   }
+  // produce movement controls
+  const moveControls = exits => {
+    const possibleExits = ["n", "s", "e", "w"];
+    return (
+      <div id="moveControls">
+        {possibleExits.map(possibleExit => {
+          return (
+            <button
+              id={`${possibleExit}MoveControl`}
+              key={`${possibleExit}MoveControl`}
+              disabled={!exits.includes(possibleExit)}
+            >
+              {possibleExit}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
   return (
     <div>
       <div>TOKEN: {token}</div>
@@ -28,6 +42,7 @@ const Adv = props => {
         <br /> Description: {description}
       </div>
       <div id="otherPlayers">Other Players {players}</div>
+      {moveControls(exits)}
       <button onClick={() => props.logout()}>Log Out</button>
     </div>
   );

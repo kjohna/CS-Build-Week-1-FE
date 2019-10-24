@@ -15,6 +15,7 @@ const createAdv = ({
   title = "",
   description = "",
   players = [],
+  exits = [],
   loading = false,
   error = null
 } = {}) => ({
@@ -23,6 +24,7 @@ const createAdv = ({
   title,
   description,
   players,
+  exits,
   loading,
   error
 });
@@ -161,6 +163,7 @@ describe("test adv reducer", () => {
         title: "room title",
         description: "description",
         players: [],
+        exits: ["n", "s"],
         loading: true
       }
     };
@@ -173,6 +176,7 @@ describe("test adv reducer", () => {
         title: "room title",
         description: "description",
         players: [],
+        exits: ["n", "s"],
         loading: false,
         error: null
       }

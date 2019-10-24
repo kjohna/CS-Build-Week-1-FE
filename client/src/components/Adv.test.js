@@ -13,7 +13,7 @@ import Adapter from "enzyme-adapter-react-16";
 configure({ adapter: new Adapter() });
 
 describe("test Adv", () => {
-  const wrapIt = () => {
+  const wrapIt = (customStateAdv = {}) => {
     const initialAuth = {
       token: "token",
       loading: false,
@@ -25,10 +25,15 @@ describe("test Adv", () => {
       title: "room title",
       description: "room description",
       players: ["player1", "player2"],
+      exits: ["n"],
       loading: false,
-      error: null
+      error: null,
+      ...customStateAdv
     };
-    const initialState = { auth: { ...initialAuth }, adv: { ...initialAdv } };
+    const initialState = {
+      auth: { ...initialAuth },
+      adv: { ...initialAdv }
+    };
     // console.log(initialState);
     // console.log(reducer());
     const reduxStore = createStore(() => initialState);
@@ -69,4 +74,23 @@ describe("test Adv", () => {
     expect(wrapped.html()).toContain("player1");
     expect(wrapped.html()).toContain("player2");
   });
+
+  it("displays movement controls, disabled if direction not available", () => {
+    const wrapped = wrapIt({ exits: ["n", "e"] });
+    console.log(wrapped.html());
+    const moveControls = wrapped.find("div#moveControls");
+    expect(moveControls.find("button#nMoveControl").prop("disabled")).toBe(
+      false
+    );
+    expect(moveControls.find("button#sMoveControl").prop("disabled")).toBe(
+      true
+    );
+    expect(moveControls.find("button#eMoveControl").prop("disabled")).toBe(
+      false
+    );
+    expect(moveControls.find("button#wMoveControl").prop("disabled")).toBe(
+      true
+    );
+  });
+  // dispatches movement action correctly when valid move is selected
 });

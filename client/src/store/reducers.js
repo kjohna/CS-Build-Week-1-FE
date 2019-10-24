@@ -46,6 +46,7 @@ const initialAdv = {
   title: "",
   description: "",
   players: [],
+  exits: [],
   loading: false,
   error: null
 };
