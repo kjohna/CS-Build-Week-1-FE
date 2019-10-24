@@ -34,7 +34,7 @@ build:
 
 testing:
   stage: test
-  dependencies: ["install"]
+  dependencies: ["install", "build"]
   script:
     - npm install
     - npm run build
